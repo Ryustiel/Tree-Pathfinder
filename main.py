@@ -1,8 +1,12 @@
-from binarytree import Node, tree, bst
+'''
+2021
+'''
+
+from binarytree import Node
 from math import sqrt
 from random import randint
 from time import time
-import replit
+import os
 
 global parameters
 parameters = [1, 0.5, 0, 1, 0, 2, 0] #[egalite, loss, scoref, arrondi, zero]
@@ -542,12 +546,12 @@ class GameInstance:
     else:
       return False
 
-  def playerInput(self, bot):
+  def playerInput(self, bottom):
     if not self.iaTurn and not self.isDone():
 
       self.iaScore = self.iaScore + self.grid[0][0] #met à jour le score de l'ia (case avant déplacement)
 
-      if bot:
+      if bottom:
         self.grid = self.grid[1:] #retire la ligne du haut
         self.j = self.j + 1
         self.game_tab[self.j][self.i][1] = 2 #coloration joueur
@@ -566,11 +570,11 @@ class GameInstance:
       setParameters(zero = self.iaScore) #définit le zero pour le winstats
 
       side_winrate = odds(sumit(simplified_tree(diagonals(self.grid), 3)))
-      bot = (side_winrate[0] >= side_winrate[1]) #NIVEAU DE SIMPLIFICATION
+      bottom = (side_winrate[0] >= side_winrate[1]) #NIVEAU DE SIMPLIFICATION
 
       self.iaScore = self.iaScore + self.grid[0][0] #met à jour le score de l'ia (case avant déplacement)
 
-      if bot:
+      if bottom:
         self.grid = self.grid[1:] #retire la ligne du haut
         self.j = self.j + 1
         self.game_tab[self.j][self.i][1] = 3 #coloration ia
@@ -612,11 +616,21 @@ def live(instance):
       instance.iaPlay()
 
     else:
-      replit.clear()
+      os.system('cls')
+      print("The bot is trying to maximise its score.\nHe hopes the game to follow the green path,\nwhich would normally be hidden from the player.")
       print(instance.simulate_path())
       print(instance.playerScore, "VS", instance.iaScore + instance.playerScore + instance.grid[0][0]) #grid 0; 0 = case actuelle de l'ia pas comptée
       
-      p = input("\ns ou d\n=> ")
+      p = input('\ntype "s" to go down or "d" to go right\n=> ')
+      
+      while True:
+        if p == "s" and len(instance.grid) < 2:
+          p = input("\n can't go further down. You have to go to the right (typing" + ' "d")\n=> ')
+        elif p == "d" and len(instance.grid[0]) < 2:
+          p = input("\n can't go further right. You have to go to the bottom (typing" + ' "s")\n=> ')
+        else:
+          break
+
       if p == "s":
         p = True
       else:
@@ -624,9 +638,9 @@ def live(instance):
       
       instance.playerInput(p)
 
-  replit.clear()
+  os.system('cls')
   print(instance.simulate_path())
-  print(instance.playerScore, "VS", instance.iaScore + instance.playerScore)
+  print("player :", instance.playerScore, "VS bot :", instance.iaScore + instance.playerScore)
   print("FINI")
 
 
@@ -700,10 +714,12 @@ ttab = [
 [1, 2, 2, 2], 
 [2, 2, 20, 2], 
 [2, 2, 2, 2],
-[2, 2, 2, 4]
+[20, 2, 2, 4]
 ]
 
-live(GameInstance(random_tab(20, 20)))
+#live(GameInstance(random_tab(20, 20)))
+live(GameInstance(random_tab(8, 8)))
+#live(GameInstance(ttab))
 
 
 #reperer le risque : faire la moyenne des valeurs du tableau, reperer la position dans les diagonales des valeurs les plus extremes, selon l'extremiter diviser à leur niveau la moyenne, pour plus de précision
